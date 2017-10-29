@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
+import bea.Circumstance;
 import bea.Individual;
 import bea.Optimizer;
 import java.util.ArrayList;
@@ -15,8 +9,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- *
- * @author wajzy
+ * Test class for demonstration purpose only.
+ * The first (commented) case is a single, the second case is a multi-objective 
+ * problem.
+ * @author Miklos F. Hatwagner
  */
 public class Main {
 
@@ -25,7 +21,10 @@ public class Main {
      */
     public static void main(String[] args) {
         
-        Function<Function<Object, Double>, ArrayList<Double>> initFn = (ip) -> {
+        Function<Circumstance<Double, Double, Double, Object>, Double> geneFn1 = (c) -> {
+            return new Random().nextDouble()*5.12*2. - 5.12;
+        };
+        Function<Function<Circumstance<Double, Double, Double, Object>, Double>, ArrayList<Double>> initFn1 = (ip) -> {
             ArrayList<Double> genes = new ArrayList<>();
             for(int i=0; i<2; i++) {
                 genes.add(ip.apply(null));
@@ -47,18 +46,30 @@ public class Main {
             }
             ind.setObjectives(objs);
         };
-        Function<Object, Double> geneFn = (gp) -> {
-            return new Random().nextDouble()*5.12*2. - 5.12;
-        };
         
-//        Optimizer<Double, Double, Double, Function<Object, Double>, Object> opt1 = 
-//                new Optimizer<>(4, initFn, geneFn, objFn1, 3, geneFn, null, 3, 500);
+//        Optimizer<Double, Double, Double, Function<Circumstance<Double, Double, Double, Object>, Double>, Object> opt1 = 
+//                new Optimizer<>(4, initFn1, geneFn1, objFn1, 3, geneFn1, null, 3, 500);
 //        
 //        opt1.optimize();
 //        System.out.println(opt1);
         
         // ------------------
         
+        // GT -> Double
+        // OT -> Double
+        // FT -> Integer
+        // GP -> Object
+        Function<Circumstance<Double, Double, Integer, Object>, Double> geneFn2 = (c) -> {
+            return new Random().nextDouble()*5.12*2. - 5.12;
+        };
+        Function<Function<Circumstance<Double, Double, Integer, Object>, Double>, ArrayList<Double>> initFn2 = (ip) -> {
+            ArrayList<Double> genes = new ArrayList<>();
+            for(int i=0; i<2; i++) {
+                genes.add(ip.apply(null));
+            }
+            return genes;
+        };
+        // GT, OT, FT
         Consumer<Individual<Double, Double, Integer>> objFn2 = (ind) -> {
             ArrayList<Double> genes = ind.getGenes();
             ArrayList<Double> objs = ind.getObjectives();
@@ -73,8 +84,9 @@ public class Main {
             ind.setObjectives(objs);
         };
         
-        Optimizer<Double, Double, Integer, Function<Object, Double>, Object> opt2 = 
-                new Optimizer<>(10, initFn, geneFn, objFn2, 3, geneFn, null, 3, 10);
+        // GT, OT, FT, IP, GP
+        Optimizer<Double, Double, Integer, Function<Circumstance<Double, Double, Integer, Object>, Double>, Object> opt2 = 
+                new Optimizer<>(10, initFn2, geneFn2, objFn2, 3, geneFn2, null, 3, 10);
         
         opt2.optimize();
         System.out.println(opt2);
